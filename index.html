@@ -62,15 +62,27 @@
         <li><a href="#pricing" class="bg-gold text-dark px-4 py-2 rounded-lg font-semibold btn-gold">Ceník</a></li>
       </ul>
     </nav>
-    <div id="nav-dropdown" class="hidden md:hidden mt-4 py-4 border-t border-dark-border bg-dark/95 text-white">
-      <ul class="flex flex-col gap-4 text-sm font-medium">
-        <li><a href="#about" class="block py-2 hover:text-gold">O mně</a></li>
-        <li><a href="#services" class="block py-2 hover:text-gold">Služby</a></li>
-        <li><a href="#process" class="block py-2 hover:text-gold">Jak to funguje</a></li>
-        <li><a href="#pricing" class="block py-2 hover:text-gold">Ceník</a></li>
-        <li><a href="#testimonials" class="block py-2 hover:text-gold">Reference</a></li>
-        <li><a href="#contact" class="block py-2 hover:text-gold">Kontakt</a></li>
+    <div
+      id="nav-dropdown"
+      class="hidden md:hidden fixed inset-x-0 top-[72px] bottom-0 z-[60] bg-dark/95 backdrop-blur-xl px-6 py-8 overflow-y-auto border-t border-dark-border"
+    >
+      <ul class="flex flex-col gap-6 text-2xl font-semibold text-white">
+        <li><a href="#about" class="block hover:text-gold transition-colors">O mně</a></li>
+        <li><a href="#services" class="block hover:text-gold transition-colors">Služby</a></li>
+        <li><a href="#process" class="block hover:text-gold transition-colors">Jak to funguje</a></li>
+        <li><a href="#pricing" class="block hover:text-gold transition-colors">Ceník</a></li>
+        <li><a href="#testimonials" class="block hover:text-gold transition-colors">Reference</a></li>
+        <li><a href="#contact" class="block hover:text-gold transition-colors">Kontakt</a></li>
       </ul>
+
+      <div class="mt-8 pt-6 border-t border-dark-border">
+        <a
+          href="#contact"
+          class="inline-flex w-full items-center justify-center bg-gold text-dark font-bold px-6 py-4 rounded-lg btn-gold"
+        >
+          Chci začít cvičit
+        </a>
+      </div>
     </div>
   </header>
 
@@ -328,54 +340,88 @@
   </footer>
 
   <script>
-    // Smooth scroll for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function(e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        document.getElementById('nav-dropdown').classList.add('hidden');
-        document.getElementById('nav-menu').classList.add('hidden');
-      });
-    });
+  const header = document.getElementById('header');
+  const navToggle = document.getElementById('nav-toggle');
+  const navDropdown = document.getElementById('nav-dropdown');
 
-    // Header scroll effect
-    const header = document.getElementById('header');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 50) header.classList.add('nav-scrolled');
-      else header.classList.remove('nav-scrolled');
-    });
+  function closeMobileMenu() {
+    navDropdown.classList.add('hidden');
+    document.body.classList.remove('overflow-hidden');
 
-    // Mobile nav toggle
-    document.getElementById('nav-toggle').addEventListener('click', () => {
-      const dropdown = document.getElementById('nav-dropdown');
-      dropdown.classList.toggle('hidden');
-    });
-
-    // Testimonial slider
-    const slides = document.querySelectorAll('.testimonial-slide');
-    const dots = document.querySelectorAll('.testimonial-dot');
-    let current = 0;
-    const total = slides.length;
-
-    function showSlide(index) {
-      current = (index + total) % total;
-      slides.forEach((s, i) => s.classList.toggle('active', i === current));
-      dots.forEach((d, i) => {
-        d.classList.toggle('bg-gold', i === current);
-        d.classList.toggle('bg-gray-600', i !== current);
-      });
+    if (window.scrollY <= 50) {
+      header.classList.remove('nav-scrolled');
     }
+  }
 
-    dots.forEach((dot, i) => dot.addEventListener('click', () => showSlide(i)));
-    let interval = setInterval(() => showSlide(current + 1), 5000);
+  function openMobileMenu() {
+    navDropdown.classList.remove('hidden');
+    document.body.classList.add('overflow-hidden');
+    header.classList.add('nav-scrolled');
+  }
 
-    // Pause slider on hover
-    document.getElementById('testimonials').addEventListener('mouseenter', () => clearInterval(interval));
-    document.getElementById('testimonials').addEventListener('mouseleave', () => { interval = setInterval(() => showSlide(current + 1), 5000); });
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      const target = document.querySelector(this.getAttribute('href'));
+      if (!target) return;
 
-    // Footer year
-    document.getElementById('year').textContent = new Date().getFullYear();
+      e.preventDefault();
+
+      if (navDropdown.contains(this)) {
+        closeMobileMenu();
+      }
+
+      const headerHeight = header.offsetHeight;
+      const targetTop = target.getBoundingClientRect().top + window.scrollY - headerHeight;
+
+      window.scrollTo({
+        top: targetTop,
+        behavior: 'smooth'
+      });
+    });
+  });
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50 || !navDropdown.classList.contains('hidden')) {
+      header.classList.add('nav-scrolled');
+    } else {
+      header.classList.remove('nav-scrolled');
+    }
+  });
+
+  navToggle.addEventListener('click', () => {
+    if (navDropdown.classList.contains('hidden')) {
+      openMobileMenu();
+    } else {
+      closeMobileMenu();
+    }
+  });
+
+  const slides = document.querySelectorAll('.testimonial-slide');
+  const dots = document.querySelectorAll('.testimonial-dot');
+  let current = 0;
+  const total = slides.length;
+
+  function showSlide(index) {
+    current = (index + total) % total;
+    slides.forEach((s, i) => s.classList.toggle('active', i === current));
+    dots.forEach((d, i) => {
+      d.classList.toggle('bg-gold', i === current);
+      d.classList.toggle('bg-gray-600', i !== current);
+    });
+  }
+
+  dots.forEach((dot, i) => dot.addEventListener('click', () => showSlide(i)));
+  let interval = setInterval(() => showSlide(current + 1), 5000);
+
+  const testimonials = document.getElementById('testimonials');
+  if (testimonials) {
+    testimonials.addEventListener('mouseenter', () => clearInterval(interval));
+    testimonials.addEventListener('mouseleave', () => {
+      interval = setInterval(() => showSlide(current + 1), 5000);
+    });
+  }
+
+  document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
