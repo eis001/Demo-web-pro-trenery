@@ -378,6 +378,42 @@ window.addEventListener('scroll', () => {
 document.querySelectorAll('#nav-dropdown a').forEach(link => {
   link.addEventListener('click', closeMenu);
 });
+
+// TESTIMONIAL SLIDER
+const slides = document.querySelectorAll('.testimonial-slide');
+const dots = document.querySelectorAll('.testimonial-dot');
+let current = 0;
+const total = slides.length;
+
+function showSlide(index) {
+  current = (index + total) % total;
+
+  slides.forEach((slide, i) => {
+    slide.classList.toggle('active', i === current);
+  });
+
+  dots.forEach((dot, i) => {
+    dot.classList.toggle('bg-gold', i === current);
+    dot.classList.toggle('bg-gray-600', i !== current);
+  });
+}
+
+dots.forEach((dot, i) => {
+  dot.addEventListener('click', () => showSlide(i));
+});
+
+let interval = setInterval(() => showSlide(current + 1), 5000);
+
+const testimonialsSection = document.getElementById('testimonials');
+if (testimonialsSection) {
+  testimonialsSection.addEventListener('mouseenter', () => clearInterval(interval));
+  testimonialsSection.addEventListener('mouseleave', () => {
+    interval = setInterval(() => showSlide(current + 1), 5000);
+  });
+}
+
+// FOOTER YEAR
+document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
